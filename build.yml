@@ -1,0 +1,10 @@
+version: "2"
+services:
+  zeek: 
+    image: registry2.lagoni.co.uk/zeek-kf:dev
+    container_name: "zeek_kf"
+    build:
+      dockerfile: Dockerfile
+      context: "./"
+    network_mode: host
+    command: ["-i", "eth2"]
