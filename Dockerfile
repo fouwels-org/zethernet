@@ -15,6 +15,9 @@ RUN cd /build/zeek && ninja -C build install
 
 # Copy in module
 COPY . /build/zeek/src/analyzer/protocol/eniplg
+COPY ./dpd.sig /build/zeek/scripts/base/protocols/eniplg/dpd.sig
+COPY ./main.zeek /build/zeek/scripts/base/protocols/eniplg/main.zeek
+COPY ./__load__.zeek /build/zeek/scripts/base/protocols/eniplg/__load__.zeek
 
 # Rebuild Zeek
 WORKDIR /build/zeek
