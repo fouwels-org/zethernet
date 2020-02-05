@@ -8,3 +8,4 @@ services:
       context: "./"
     network_mode: host
     command: ["-i", "eth2"]
+    #command: ["-Cr",  "/tests/lagoni/retransmission_crash.pcap"]

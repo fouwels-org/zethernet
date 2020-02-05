@@ -14,6 +14,70 @@
 # 	
 # };
 
-type ENIPLG_PDU(is_orig: bool) = record {
-	data: bytestring &restofdata;
-} &byteorder=bigendian;
+type ENIPLG_PDU(is_orig: bool) = case is_orig of {
+    true  -> request    : ENIP_Request;
+    false -> response   : ENIP_Response;
+    } &byteorder=littleendian;
+
+# switch for the request portion
+type ENIP_Request = record {
+    header  : ENIP;
+    data    : case(header.command) of {
+                ##NOP                     -> nop                  : Nop;
+            	##REGISTER_SESSION        -> register_session     : Register;
+                ##! UNREGISTER_SESSION  -> unregister_session   : Register;
+                ##SEND_RR_DATA            -> send_rr_data         : RR_Unit(header);
+                ##SEND_UNIT_DATA          -> send_unit_data       : RR_Unit(header);
+                default                 -> unknown              : bytestring &restofdata;
+                };
+    } &byteorder=littleendian;
+
+# switch for the response portion
+type ENIP_Response = record {
+    header: ENIP;
+    data: case(header.command) of {
+        #LIST_SERVICES       -> list_services        : List_Services;
+        LIST_IDENTITY       -> list_identity        : List_Identity;
+        #LIST_INTERFACES     -> list_interfaces      : List_Interfaces;
+        #REGISTER_SESSION    -> register_session     : Register;
+        #UNREGISTER_SESSION  -> unregister_session   : Register;
+        #SEND_RR_DATA        -> send_rr_data         : RR_Unit(header);
+        ##! SEND_UNIT_DATA  -> send_unit_data       : RR_Unit(header);
+        default             -> unknown              : bytestring &restofdata;
+        };
+    } &byteorder=littleendian;
+
+type ENIP = record {
+    command         : uint16;               # Command identifier
+    length          : uint16;               # Length of everyting (header + data)
+    session_handle  : uint32;               # Session handle
+    status          : uint32;               # Status
+    sender_context  : bytestring &length=8; # Sender context
+    options         : uint32;               # Option flags
+    } &byteorder=littleendian;
+
+type List_Identity = record {
+    item_count          : uint16;
+    response_id         : uint16;
+    length              : uint16;
+    encap_version       : uint16;
+    sock_info           : Sock_Info;
+    vendor              : uint16;
+    device_type         : uint16;
+    product_code        : uint16;
+    revision_high       : uint8;
+    revision_low        : uint8;
+    status              : uint16;
+    serial_number       : uint32;
+    product_name_len    : uint8;
+    product_name        : bytestring &length=product_name_len;
+    state               : uint8;
+    } &byteorder=littleendian;
+
+
+type Sock_Info = record {
+    sin_family  : int16;
+    sin_port    : uint16;
+    sin_addr    : uint32;
+    sin_zero    : uint8[8];
+    } &byteorder=bigendian;
