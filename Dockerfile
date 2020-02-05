@@ -13,11 +13,13 @@ RUN cd /build/zeek && ./configure --generator=Ninja
 RUN cd /build/zeek && ninja -C build
 RUN cd /build/zeek && ninja -C build install
 
-# Copy in module, and rebuild zeek
-
+# Copy in module
 COPY . /build/zeek/src/analyzer/protocol/eniplg
-RUN cd /build/zeek && ./configure --generator=Ninja
-RUN cd /build/zeek && ninja -C build
-RUN cd /build/zeek && ninja -C build install
 
-ENTRYPOINT [ "/zeek/bin/zeek" ]
+# Rebuild Zeek
+WORKDIR /build/zeek
+RUN ./configure --generator=Ninja
+RUN ninja -C build
+RUN ninja -C build install
+
+ENTRYPOINT [ "/usr/local/zeek/bin/zeek" ]
