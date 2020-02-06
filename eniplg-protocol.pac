@@ -35,14 +35,14 @@ type ENIPLG_PDU(is_orig: bool) = record {
         true  -> request    : ENIP_Request(header);
         false -> response   : ENIP_Response(header);
     };
-} &byteorder=littleendian &length=header.length + 24;
+} &byteorder=littleendian;
 
 type ENIP_Header = record {
     command         : uint16;               # Command identifier
     length         : uint16;                # Length of body
     session_handle  : uint32;               # Session handle
     status          : uint32;               # Status
-    sender_context  : uint8[8];             # Sender context
+    sender_context  : uint64;             # Sender context
     options         : uint32;               # Option flags
 }  &byteorder=littleendian, &let {
     handle: bool = $context.flow.enip_header_command(this);
@@ -66,7 +66,7 @@ type ENIP_Response(header: ENIP_Header) = record {
 
     data: case(header.command) of {
         #LIST_SERVICES       -> list_services        : List_Services;
-        LIST_IDENTITY       -> list_identity        : List_Identity;
+        #LIST_IDENTITY       -> list_identity        : List_Identity;
         #LIST_INTERFACES     -> list_interfaces      : List_Interfaces;
         #REGISTER_SESSION    -> register_session     : Register;
         #UNREGISTER_SESSION  -> unregister_session   : Register;

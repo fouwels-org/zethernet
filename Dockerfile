@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 
 RUN apt-get update && apt-get install -y python3 cmake build-essential cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev git
 
-ENV ZEEK_VERSION v3.0.1
+ENV ZEEK_VERSION master
 
 # Build Zeek
 WORKDIR /build
