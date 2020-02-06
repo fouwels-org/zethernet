@@ -2,12 +2,20 @@
 
 refine flow ENIPLG_Flow += {
 	function enip_list_identity(list_identity: List_Identity): bool 
-		%{
-		printf("Vendor %d\nProduct %s\n",		    ${list_identity.vendor},
-													std_str(${list_identity.product_name}).c_str());
+	%{
+		printf("Vendor %#02x Product %s\n", ${list_identity.vendor}, std_str(${list_identity.product_name}).c_str());
 
-	 	BifEvent::generate_eniplg_event(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn());
+	 	//BifEvent::generate_eniplg_identity(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn(), ${list_identity.vendor}, ${list_identity.product_name});
 
 		return true;
-		%}	
+	%}	
+
+	function enip_header_command(enip_header: ENIP_Header): bool 
+	%{
+		printf("ENIP Command Code %#02x\n", ${enip_header.command});
+
+		//BifEvent::generate_eniplg_command(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn(), ${enip_header.command});
+
+		return true;
+	%}	
 };

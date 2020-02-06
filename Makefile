@@ -9,7 +9,6 @@ push:
 	$(COMPOSE) -f $(BUILDFILE) push
 up:
 	$(COMPOSE) -f $(BUILDFILE) up
-
 up-d:
 	$(COMPOSE) -f $(BUILDFILE) up -d
 
