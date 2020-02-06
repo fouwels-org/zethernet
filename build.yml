@@ -1,11 +1,13 @@
 version: "2"
 services:
   zeek: 
-    image: registry2.lagoni.co.uk/zeek-kf:dev
+    image: registry2.lagoni.co.uk/lagoni-engineering/zeek-kf:dev
     container_name: "zeek_kf"
+    stdin_open: true
+    tty: true
     build:
       dockerfile: Dockerfile
       context: "./"
+    privileged: true
     network_mode: host
-    command: ["-i", "eth2"]
-    #command: ["-Cr",  "/tests/lagoni/retransmission_crash.pcap"]
+    command: ["-CSi", "enp3s0"]

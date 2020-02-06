@@ -16,9 +16,7 @@ RUN cd /build/zeek && ninja -C build install
 
 # Copy in module
 COPY . /build/zeek/src/analyzer/protocol/eniplg
-COPY ./dpd.sig /build/zeek/scripts/base/protocols/eniplg/dpd.sig
-COPY ./main.zeek /build/zeek/scripts/base/protocols/eniplg/main.zeek
-COPY ./__load__.zeek /build/zeek/scripts/base/protocols/eniplg/__load__.zeek
+COPY ./scripts/. /build/zeek/scripts/base/protocols/eniplg
 RUN echo "add_subdirectory(eniplg)" >> /build/zeek/src/analyzer/protocol/CMakeLists.txt
 RUN echo "@load base/protocols/eniplg" >> /build/zeek/scripts/base/init-default.zeek
 
@@ -27,6 +25,8 @@ RUN echo "@load base/protocols/eniplg" >> /build/zeek/scripts/base/init-default.
 RUN cd /build/zeek && ./configure --generator=Ninja
 RUN cd /build/zeek && ninja -C build all
 RUN cd /build/zeek && ninja -C build install
+
+#RUN setcap cap_net_raw,cap_net_admin,cap_dac_override+eip /usr/local/zeek/bin/zeek
 
 COPY ./tests/ /tests/
 

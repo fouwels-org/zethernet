@@ -24,20 +24,6 @@ connection ENIPLG_Conn(bro_analyzer: BroAnalyzer) {
 
 %include eniplg-protocol.pac
 
-enum command_codes {
-    NOP                 = 0x0000,
-    LIST_SERVICES       = 0x0004,
-    LIST_IDENTITY       = 0x0063,
-    LIST_INTERFACES     = 0x0064,
-    REGISTER_SESSION    = 0x0065,
-    UNREGISTER_SESSION  = 0x0066,
-    SEND_RR_DATA        = 0x006F,
-    SEND_UNIT_DATA      = 0x0070,
-    INDICATE_STATUS     = 0x0072,
-    CANCEL              = 0x0073,
-    # Other values are Reserved for future usage or Reserved for legacy
-    };
-
 # Now we define the flow:
 flow ENIPLG_Flow(is_orig: bool) {
 
