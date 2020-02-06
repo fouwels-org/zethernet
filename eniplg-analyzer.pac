@@ -11,7 +11,3 @@ refine flow ENIPLG_Flow += {
 		return true;
 		%}	
 };
-
-refine typeattr List_Identity += &let {
-    proc: bool = $context.flow.enip_list_identity(this);
-    };

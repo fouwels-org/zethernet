@@ -88,7 +88,9 @@ type List_Identity = record {
     product_name_len    : uint8;
     product_name        : bytestring &length=product_name_len;
     state               : uint8;
-    } &byteorder=littleendian;
+    } &byteorder=littleendian, &let {
+        proc: bool = $context.flow.enip_list_identity(this);
+    };
 
 
 type Sock_Info = record {
