@@ -11,8 +11,8 @@ RUN git clone --recursive --branch $ZEEK_VERSION https://github.com/zeek/zeek
 
 RUN apt-get update && apt-get install -y ninja-build
 RUN cd /build/zeek && ./configure
-RUN cd /build/zeek && make
-RUN cd /build/zeek&& make install
+RUN cd /build/zeek && Ninja -c build
+RUN cd /build/zeek && Ninja -c build install
 
 # Copy in module
 COPY . /build/zeek/src/analyzer/protocol/eniplg
@@ -23,8 +23,8 @@ RUN echo "@load base/protocols/eniplg" >> /build/zeek/scripts/base/init-default.
 
 # Rebuild Zeek
 RUN cd /build/zeek && ./configure
-RUN cd /build/zeek && make all
-RUN cd /build/zeek && make install
+RUN cd /build/zeek && Ninja -c build
+RUN cd /build/zeek && Ninja -c build install
 
 #RUN setcap cap_net_raw,cap_net_admin,cap_dac_override+eip /usr/local/zeek/bin/zeek
 
