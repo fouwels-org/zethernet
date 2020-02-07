@@ -3,16 +3,16 @@ FROM ubuntu:18.04
 
 RUN apt-get update && apt-get install -y python3 cmake build-essential cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev git
 
-ENV ZEEK_VERSION master
+ENV ZEEK_VERSION v3.0.1
 
 # Build Zeek
 WORKDIR /build
 RUN git clone --recursive --branch $ZEEK_VERSION https://github.com/zeek/zeek
 
 RUN apt-get update && apt-get install -y ninja-build
-RUN cd /build/zeek && ./configure --generator=Ninja
-RUN cd /build/zeek && ninja -C build
-RUN cd /build/zeek && ninja -C build install
+RUN cd /build/zeek && ./configure
+RUN cd /build/zeek && make
+RUN cd /build/zeek&& make install
 
 # Copy in module
 COPY . /build/zeek/src/analyzer/protocol/eniplg
@@ -22,9 +22,9 @@ RUN echo "@load base/protocols/eniplg" >> /build/zeek/scripts/base/init-default.
 
 
 # Rebuild Zeek
-RUN cd /build/zeek && ./configure --generator=Ninja
-RUN cd /build/zeek && ninja -C build all
-RUN cd /build/zeek && ninja -C build install
+RUN cd /build/zeek && ./configure
+RUN cd /build/zeek && make all
+RUN cd /build/zeek && make install
 
 #RUN setcap cap_net_raw,cap_net_admin,cap_dac_override+eip /usr/local/zeek/bin/zeek
 
