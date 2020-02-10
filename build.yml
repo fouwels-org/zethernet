@@ -10,4 +10,4 @@ services:
       context: "./"
     privileged: true
     network_mode: host
-    command: ["-i", "enp3s0"]
+    command: ["-B", "scripts", "-i", "enp3s0"]

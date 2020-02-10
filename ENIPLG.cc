@@ -50,11 +50,6 @@ void ENIPLG_Analyzer::DeliverStream(int len, const u_char* data, bool orig)
 	if ( TCP()->IsPartial() )
 		return;
 
-	if ( had_gap )
-		// If only one side had a content gap, we could still try to
-		// deliver data to the other side if the script layer can handle this.
-		return;
-
 	try
 		{
 		interp->NewData(orig, data, data + len);
@@ -68,6 +63,4 @@ void ENIPLG_Analyzer::DeliverStream(int len, const u_char* data, bool orig)
 void ENIPLG_Analyzer::Undelivered(uint64 seq, int len, bool orig)
 	{
 	tcp::TCP_ApplicationAnalyzer::Undelivered(seq, len, orig);
-	had_gap = true;
-	interp->NewGap(orig, len);
 	}

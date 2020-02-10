@@ -22,7 +22,7 @@ RUN echo "@load base/protocols/eniplg" >> /build/zeek/scripts/base/init-default.
 
 
 # Rebuild Zeek
-RUN cd /build/zeek && ./configure --generator=Ninja
+RUN cd /build/zeek && ./configure --enable-debug --generator=Ninja
 RUN cd /build/zeek && ninja -C build
 RUN cd /build/zeek && ninja -C build install
 
