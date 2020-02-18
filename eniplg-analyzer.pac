@@ -12,6 +12,9 @@ refine flow ENIPLG_Flow += {
 
 	function enip_header_command(enip_header: ENIP_Header): bool 
 	%{
+		if ${enip_header.command} == 0x70 {
+			return;
+		}
 		printf("ENIP Command Code %#02x | length: %i | session handle: %X | context: %X", ${enip_header.command}, ${enip_header.length}, ${enip_header.session_handle}, ${enip_header.sender_context});
 		printf("\n");
 
