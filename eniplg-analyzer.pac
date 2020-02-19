@@ -3,20 +3,16 @@
 refine flow ENIPLG_Flow += {
 	function enip_list_identity(list_identity: List_Identity): bool 
 	%{
-		//printf("Vendor %#02x Product %s\n", ${list_identity.vendor}, std_str(${list_identity.product_name}).c_str());
+		printf("[EVENT: LIST_IDENTITY] Vendor %#02x Product %s\n", ${list_identity.vendor}, std_str(${list_identity.product_name}).c_str());
 
 	 	//BifEvent::generate_eniplg_identity(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn(), ${list_identity.vendor}, ${list_identity.product_name});
 
 		return true;
 	%}	
 
-	function enip_header_command(enip_header: ENIP_Header): bool 
+	function enip_other(other: Other): bool 
 	%{
-		if ${enip_header.command} == 0x70 {
-			return;
-		}
-		printf("ENIP Command Code %#02x | length: %i | session handle: %X | context: %X", ${enip_header.command}, ${enip_header.length}, ${enip_header.session_handle}, ${enip_header.sender_context});
-		printf("\n");
+		printf("[EVENT: GENERIC]\n");
 
 		//BifEvent::generate_eniplg_command(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn(), ${enip_header.command});
 
