@@ -26,6 +26,7 @@ RUN cd /build/zeek && ninja -C build && ninja -C build install
 #RUN setcap cap_net_raw,cap_net_admin,cap_dac_override+eip /usr/local/zeek/bin/zeek
 
 FROM ubuntu:18.04
+RUN apt-get update && apt-get install -y libpcap-dev libssl-dev zlib1g-dev 
 COPY --from=build /usr/local/zeek/ /usr/local/zeek/
 COPY ./tests/ /tests/
 ENTRYPOINT [ "/usr/local/zeek/bin/zeek" ]
