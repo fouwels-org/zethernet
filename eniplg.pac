@@ -33,7 +33,7 @@ flow ENIPLG_Flow(is_orig: bool) {
 	# This is needed for &oneline and &length. If you don't need this, you'll
 	# get better performance with datagram.
 
-	datagram = ENIPLG_PDU(is_orig) withcontext(connection, this);
+	flowunit = ENIP_PDU(is_orig) withcontext(connection, this);
 
 };
 

@@ -24,18 +24,20 @@ enum command_codes {
     UNREGISTER_SESSION  = 0x66,
     SEND_RR_DATA        = 0x6F,
     SEND_UNIT_DATA      = 0x70,
+
+    # Not Implemented
     INDICATE_STATUS     = 0x72,
     CANCEL              = 0x73,
     # Other values are Reserved for future usage or Reserved for legacy
     };
 
-type ENIPLG_PDU(is_orig: bool) = record {
+type ENIP_PDU(is_orig: bool) = record {
     header: ENIP_Header;
     body: case is_orig of {
         true  -> request    : ENIP_Request(header);
         false -> response   : ENIP_Response(header);
     };
-} &byteorder=littleendian;
+} &byteorder=littleendian &length = 24 + header.length;
 
 type ENIP_Header = record {
     command         : uint16;               # Command identifier
@@ -44,65 +46,120 @@ type ENIP_Header = record {
     status          : uint32;               # Status
     sender_context  : uint64;             # Sender context
     options         : uint32;               # Option flags
-}  &byteorder=littleendian
+} &let {
+    handle: bool = $context.flow.enip_header(this);
+} &byteorder=littleendian;
 
-# switch for the request portion
 type ENIP_Request(header: ENIP_Header) = record {
     
     data : case(header.command) of {
-        NOP                     -> nop                  : Other;
-        REGISTER_SESSION        -> register_session     : Other;
-        UNREGISTER_SESSION      -> unregister_session   : Other;
-        SEND_RR_DATA            -> send_rr_data         : Other;
-        SEND_UNIT_DATA          -> send_unit_data       : Other;
-        default                 -> unknown              : bytestring &restofdata;
+        LIST_SERVICES       -> list_services : List_Services_Request(header);
+        LIST_IDENTITY       -> list_identity : List_Identity_Request(header);
+        LIST_INTERFACES     -> list_interfaces : List_Interfaces_Request(header);
+        REGISTER_SESSION        -> register_session : Register_Session_Request(header);
+
+        NOP                     -> nop : Nop(header);
+        UNREGISTER_SESSION      -> unregister_session : UnRegister_Session(header);
+        SEND_RR_DATA            -> send_rr_data : Send_RR_Data(header);
+        SEND_UNIT_DATA          -> send_unit_data : Send_Unit_Data(header);
+        default                 -> unknown : bytestring &restofdata;
     };
 } &byteorder=littleendian;
 
-# switch for the response portion
 type ENIP_Response(header: ENIP_Header) = record {
 
     data: case(header.command) of {
-        LIST_SERVICES       -> list_services        : Other;
-        LIST_IDENTITY       -> list_identity        : List_Identity;
-        LIST_INTERFACES     -> list_interfaces      : Other;
-        REGISTER_SESSION    -> register_session     : Other;
-        UNREGISTER_SESSION  -> unregister_session   : Other;
-        SEND_RR_DATA        -> send_rr_data         : Other;
-        SEND_UNIT_DATA      -> send_unit_data       : Other;
-        default             -> unknown              : bytestring &restofdata;
+        LIST_SERVICES       -> list_services : List_Services_Response(header);
+        LIST_IDENTITY       -> list_identity : List_Identity_Response(header);
+        LIST_INTERFACES     -> list_interfaces : List_Interfaces_Response(header);
+        REGISTER_SESSION    -> register_session : Register_Session_Response(header);
+
+        UNREGISTER_SESSION  -> unregister_session : UnRegister_Session(header);
+        SEND_RR_DATA        -> sendrr_data : Send_RR_Data(header);
+        SEND_UNIT_DATA      -> send_unit_data : Send_Unit_Data(header);
+        default             -> unknown : bytestring &restofdata;
     };
 } &byteorder=littleendian;
 
-type Sock_Info = record {
-    sin_family  : int16;
-    sin_port    : uint16;
-    sin_addr    : uint32;
-    sin_zero    : uint8[8];
-} &byteorder=bigendian;
-
-type List_Identity = record {
-    item_count          : uint16;
-    response_id         : uint16;
-    length              : uint16;
-    encap_version       : uint16;
-    sock_info           : Sock_Info;
-    vendor              : uint16;
-    device_type         : uint16;
-    product_code        : uint16;
-    revision_high       : uint8;
-    revision_low        : uint8;
-    status              : uint16;
-    serial_number       : uint32;
-    product_name_len    : uint8;
-    product_name        : bytestring &length=product_name_len;
-    state               : uint8;
+# Body 
+type Nop(header: ENIP_Header) = record {
+    # None
 } &let {
-    handle: bool = $context.flow.enip_list_identity(this);
+    handle: bool = $context.flow.enip_nop(header, this);
 } &byteorder=littleendian;
 
-type Other = record {
-    unknown             : bytestring &restofdata;
+type List_Services_Request(header: ENIP_Header) = record {
+    # None
 } &let {
-    handle: bool = $context.flow.enip_other(this);
+    handle: bool = $context.flow.enip_list_services_request(header, this);
+} &byteorder=littleendian;
+
+type List_Services_Response(header: ENIP_Header) = record {
+    item_count : uint16;
+    items : bytestring &restofdata;
+} &let {
+    handle: bool = $context.flow.enip_list_services_response(header, this);
+} &byteorder=littleendian;
+
+type List_Identity_Request(header: ENIP_Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.enip_list_identity_request(header, this);
+} &byteorder=littleendian;
+
+type List_Identity_Response(header: ENIP_Header) = record {
+    item_count : uint16;
+    items : bytestring &restofdata;
+} &let {
+    handle: bool = $context.flow.enip_list_identity_response(header, this);
+} &byteorder=littleendian;
+
+type List_Interfaces_Request(header: ENIP_Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.enip_list_interfaces_request(header, this);
+} &byteorder=littleendian;
+
+type List_Interfaces_Response(header: ENIP_Header) = record {
+    item_count : uint16;
+    items : bytestring &restofdata;
+} &let {
+    handle: bool = $context.flow.enip_list_interfaces_response(header, this);
+} &byteorder=littleendian;
+
+type Register_Session_Request(header: ENIP_Header) = record {
+    protocol_version : uint16;
+    options_flags : uint16;
+} &let {
+    handle: bool = $context.flow.enip_register_session_request(header, this);
+} &byteorder=littleendian;
+
+type Register_Session_Response(header: ENIP_Header) = record {
+    protocol_version : uint16;
+    options_flags : uint16;
+} &let {
+    handle: bool = $context.flow.enip_register_session_response(header, this);
+} &byteorder=littleendian;
+
+type Send_RR_Data(header: ENIP_Header) = record {
+    InterfaceHandle : uint32;
+    Timeout : uint16;
+    encapsulated_packet : bytestring &restofdata;
+} &let {
+    handle: bool = $context.flow.enip_sendrr_data(header, this);
+} &byteorder=littleendian;
+
+
+type Send_Unit_Data(header: ENIP_Header) = record {
+    InterfaceHandle : uint32;
+    Timeout : uint16;
+    encapsulated_packet : bytestring &restofdata;
+} &let {
+    handle: bool = $context.flow.enip_send_unit_data(header, this);
+} &byteorder=littleendian;
+
+type UnRegister_Session(header: ENIP_Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.enip_unregister_session(header, this);
 } &byteorder=littleendian;
