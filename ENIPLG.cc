@@ -10,54 +10,79 @@
 
 using namespace analyzer::eniplg;
 
-ENIPLG_Analyzer::ENIPLG_Analyzer(Connection* c)
+/* TCP */
 
-: tcp::TCP_ApplicationAnalyzer("ENIPLG", c)
-
-	{
+ENIPLG_Analyzer::ENIPLG_Analyzer(Connection* c) : tcp::TCP_ApplicationAnalyzer("ENIPLG", c)
+{
 	interp = new binpac::ENIPLG::ENIPLG_Conn(this);
-	
 	had_gap = false;
-	
-	}
+}
 
 ENIPLG_Analyzer::~ENIPLG_Analyzer()
-	{
+{
 	delete interp;
-	}
+}
 
 void ENIPLG_Analyzer::Done()
-	{
-	
+{
 	tcp::TCP_ApplicationAnalyzer::Done();
-
 	interp->FlowEOF(true);
 	interp->FlowEOF(false);
-	
-	}
+}
 
 void ENIPLG_Analyzer::EndpointEOF(bool is_orig)
-	{
+{
 	tcp::TCP_ApplicationAnalyzer::EndpointEOF(is_orig);
 	interp->FlowEOF(is_orig);
-	}
+}
 
 void ENIPLG_Analyzer::DeliverStream(int len, const u_char* data, bool orig)
-	{
+{
 	tcp::TCP_ApplicationAnalyzer::DeliverStream(len, data, orig);
 
 	assert(TCP());
 	try
-		{
+	{
 		interp->NewData(orig, data, data + len);
-		}
-	catch ( const binpac::Exception& e )
-		{
-		ProtocolViolation(fmt("Binpac exception: %s", e.c_msg()));
-		}
 	}
+	catch ( const binpac::Exception& e )
+	{
+		ProtocolViolation(fmt("Binpac exception: %s", e.c_msg()));
+	}
+}
 
 void ENIPLG_Analyzer::Undelivered(uint64 seq, int len, bool orig)
-	{
+{
 	tcp::TCP_ApplicationAnalyzer::Undelivered(seq, len, orig);
+}
+
+/* UDP */
+
+ENIPLG_UDP_Analyzer::ENIPLG_UDP_Analyzer(Connection* c) : analyzer::Analyzer("ENIPLG_UDP", c)
+{
+	interp = new binpac::ENIPLG::ENIPLG_Conn(this);
+	
+}
+
+ENIPLG_UDP_Analyzer::~ENIPLG_UDP_Analyzer()
+{
+	delete interp;
+}
+
+void ENIPLG_UDP_Analyzer::Done()
+{
+	Analyzer::Done();
+}
+
+void ENIPLG_UDP_Analyzer::DeliverPacket(int len, const u_char* data, bool orig, uint64 seq, const IP_Hdr* ip, int caplen)
+{
+	Analyzer::DeliverPacket(len, data, orig, seq, ip, caplen);
+	try
+	{
+		interp->NewData(orig, data, data + len);
 	}
+	catch ( const binpac::Exception& e )
+	{
+		ProtocolViolation(fmt("Binpac exception: %s", e.c_msg()));
+	}
+}
