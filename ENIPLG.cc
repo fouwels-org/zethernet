@@ -47,9 +47,6 @@ void ENIPLG_Analyzer::DeliverStream(int len, const u_char* data, bool orig)
 	tcp::TCP_ApplicationAnalyzer::DeliverStream(len, data, orig);
 
 	assert(TCP());
-	if ( TCP()->IsPartial() )
-		return;
-
 	try
 		{
 		interp->NewData(orig, data, data + len);
