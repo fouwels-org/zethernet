@@ -11,32 +11,31 @@
 using namespace analyzer::eniplg;
 
 /* TCP */
-
-ENIPLG_Analyzer::ENIPLG_Analyzer(Connection* c) : tcp::TCP_ApplicationAnalyzer("ENIPLG", c)
+ENIPLG_TCP_Analyzer::ENIPLG_TCP_Analyzer(Connection* c) : tcp::TCP_ApplicationAnalyzer("ENIPLG_TCP", c)
 {
 	interp = new binpac::ENIPLG::ENIPLG_Conn(this);
 	had_gap = false;
 }
 
-ENIPLG_Analyzer::~ENIPLG_Analyzer()
+ENIPLG_TCP_Analyzer::~ENIPLG_TCP_Analyzer()
 {
 	delete interp;
 }
 
-void ENIPLG_Analyzer::Done()
+void ENIPLG_TCP_Analyzer::Done()
 {
 	tcp::TCP_ApplicationAnalyzer::Done();
 	interp->FlowEOF(true);
 	interp->FlowEOF(false);
 }
 
-void ENIPLG_Analyzer::EndpointEOF(bool is_orig)
+void ENIPLG_TCP_Analyzer::EndpointEOF(bool is_orig)
 {
 	tcp::TCP_ApplicationAnalyzer::EndpointEOF(is_orig);
 	interp->FlowEOF(is_orig);
 }
 
-void ENIPLG_Analyzer::DeliverStream(int len, const u_char* data, bool orig)
+void ENIPLG_TCP_Analyzer::DeliverStream(int len, const u_char* data, bool orig)
 {
 	tcp::TCP_ApplicationAnalyzer::DeliverStream(len, data, orig);
 
@@ -51,7 +50,7 @@ void ENIPLG_Analyzer::DeliverStream(int len, const u_char* data, bool orig)
 	}
 }
 
-void ENIPLG_Analyzer::Undelivered(uint64 seq, int len, bool orig)
+void ENIPLG_TCP_Analyzer::Undelivered(uint64 seq, int len, bool orig)
 {
 	tcp::TCP_ApplicationAnalyzer::Undelivered(seq, len, orig);
 }

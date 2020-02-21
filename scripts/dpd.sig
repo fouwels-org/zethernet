@@ -2,7 +2,7 @@
 
 signature dpd_eniplg {
 	
-	ip-proto == tcp
+	# ip-proto == tcp
 	
 
 	# ## TODO: Define the payload. When Bro sees this regex, on
@@ -10,5 +10,5 @@ signature dpd_eniplg {
 	# ## connection.
 	# ## payload /^ENIPLG/
 
-	enable "eniplg"
+	# enable "eniplg"
 }

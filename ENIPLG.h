@@ -9,11 +9,11 @@
 
 namespace analyzer { namespace eniplg {
 
-class ENIPLG_Analyzer : public tcp::TCP_ApplicationAnalyzer
+class ENIPLG_TCP_Analyzer : public tcp::TCP_ApplicationAnalyzer
 {
 	public:
-		ENIPLG_Analyzer(Connection* conn);
-		virtual ~ENIPLG_Analyzer();
+		ENIPLG_TCP_Analyzer(Connection* conn);
+		virtual ~ENIPLG_TCP_Analyzer();
 
 		// Overriden from Analyzer.
 		virtual void Done();
@@ -25,7 +25,7 @@ class ENIPLG_Analyzer : public tcp::TCP_ApplicationAnalyzer
 		
 		static analyzer::Analyzer* InstantiateAnalyzer(Connection* conn)
 		{
-			return new ENIPLG_Analyzer(conn);
+			return new ENIPLG_TCP_Analyzer(conn);
 		}
 
 	protected:
