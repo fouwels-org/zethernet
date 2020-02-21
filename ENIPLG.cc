@@ -60,7 +60,6 @@ void ENIPLG_TCP_Analyzer::Undelivered(uint64 seq, int len, bool orig)
 ENIPLG_UDP_Analyzer::ENIPLG_UDP_Analyzer(Connection* c) : analyzer::Analyzer("ENIPLG_UDP", c)
 {
 	interp = new binpac::ENIPLG::ENIPLG_Conn(this);
-	
 }
 
 ENIPLG_UDP_Analyzer::~ENIPLG_UDP_Analyzer()

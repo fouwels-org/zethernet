@@ -11,5 +11,5 @@
 ##
 ## c: The connection
 ##
-#event eniplg_identity%(c: connection, vendor: count, product_name: string %);
-#event eniplg_command%(c: connection, command: count %);
+event eniplg_header%(c: connection, header: ENIP_Header%);
+event eniplg_nop%(c: connection, header: ENIP_Header, body: Nop%);

@@ -107,9 +107,29 @@ type List_Identity_Request(header: ENIP_Header) = record {
     handle: bool = $context.flow.enip_list_identity_request(header, this);
 } &byteorder=littleendian;
 
+type Sock_Info = record {
+    sin_family  : int16;
+    sin_port    : uint16;
+    sin_addr    : uint32;
+    sin_zero    : uint8[8];
+} &byteorder=bigendian;
+
+
 type List_Identity_Response(header: ENIP_Header) = record {
-    item_count : uint16;
-    items : bytestring &restofdata;
+    item_count          : uint16;
+    type_id             : uint16;
+    length              : uint16;
+    encap_version       : uint16;
+    sock_info           : Sock_Info;
+    vendor              : uint16;
+    device_type         : uint16;
+    product_code        : uint16;
+    revision            : uint16;
+    status              : uint16;
+    serial_number       : uint32;
+    product_name_len    : uint8;
+    product_name        : bytestring &length=product_name_len;
+    state               : uint8;
 } &let {
     handle: bool = $context.flow.enip_list_identity_response(header, this);
 } &byteorder=littleendian;
