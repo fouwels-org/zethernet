@@ -47,7 +47,7 @@ refine flow ENIPLG_Flow += {
 	function enip_list_identity_response(header: ENIP_Header, body: List_Identity_Response): bool 
 	%{
 		printf("[EVENT: enip_list_identity_response] ");
-		printf("com: %#04x ses_handle: %#08x stat: %#08x s_cont: %#016lx opt: %#08x len: %i serial_number: %#08x: product_name_length: %i product_name: %s", ${header.command}, ${header.session_handle}, ${header.status}, ${header.sender_context}, ${header.options}, ${header.length}, ${body.serial_number}, ${body.product_name_len}, bytestring_to_val(${body.product_name})); 
+		printf("com: %#04x ses_handle: %#08x stat: %#08x s_cont: %#016lx opt: %#08x len: %i serial_number: %#08x: product_name_length: %i product_name: %s", ${header.command}, ${header.session_handle}, ${header.status}, ${header.sender_context}, ${header.options}, ${header.length}, ${body.serial_number}, ${body.product_name_len}, bytestring_to_string(${body.product_name})); 
 		printf("\n"); 
 
 		BifEvent::generate_eniplg_list_identity_response(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn(), {header}, {body}); 
