@@ -31,15 +31,15 @@ enum command_codes {
     # Other values are Reserved for future usage or Reserved for legacy
     };
 
-type ENIP_PDU(is_orig: bool) = record {
-    header: ENIP_Header;
+type PDU(is_orig: bool) = record {
+    header: Header;
     body: case is_orig of {
-        true  -> request    : ENIP_Request(header);
-        false -> response   : ENIP_Response(header);
+        true  -> request    : Request(header);
+        false -> response   : Response(header);
     };
 } &byteorder=littleendian &length = 24 + header.length;
 
-type ENIP_Header = record {
+type Header = record {
     command         : uint16;               # Command identifier
     length          : uint16;                # Length of body
     session_handle  : uint32;               # Session handle
@@ -47,10 +47,10 @@ type ENIP_Header = record {
     sender_context  : uint64;             # Sender context
     options         : uint32;               # Option flags
 } &let {
-    handle: bool = $context.flow.enip_header(this);
+    handle: bool = $context.flow.header(this);
 } &byteorder=littleendian;
 
-type ENIP_Request(header: ENIP_Header) = record {
+type Request(header: Header) = record {
     
     data : case(header.command) of {
         LIST_SERVICES       -> list_services : List_Services_Request(header);
@@ -66,7 +66,7 @@ type ENIP_Request(header: ENIP_Header) = record {
     };
 } &byteorder=littleendian;
 
-type ENIP_Response(header: ENIP_Header) = record {
+type Response(header: Header) = record {
 
     data: case(header.command) of {
         LIST_SERVICES       -> list_services : List_Services_Response(header);
@@ -82,29 +82,29 @@ type ENIP_Response(header: ENIP_Header) = record {
 } &byteorder=littleendian;
 
 # Body 
-type Nop(header: ENIP_Header) = record {
+type Nop(header: Header) = record {
     # None
 } &let {
-    handle: bool = $context.flow.enip_nop(header, this);
+    handle: bool = $context.flow.nop(header, this);
 } &byteorder=littleendian;
 
-type List_Services_Request(header: ENIP_Header) = record {
+type List_Services_Request(header: Header) = record {
     # None
 } &let {
-    handle: bool = $context.flow.enip_list_services_request(header, this);
+    handle: bool = $context.flow.list_services_request(header, this);
 } &byteorder=littleendian;
 
-type List_Services_Response(header: ENIP_Header) = record {
+type List_Services_Response(header: Header) = record {
     item_count : uint16;
     items : bytestring &restofdata;
 } &let {
-    handle: bool = $context.flow.enip_list_services_response(header, this);
+    handle: bool = $context.flow.list_services_response(header, this);
 } &byteorder=littleendian;
 
-type List_Identity_Request(header: ENIP_Header) = record {
+type List_Identity_Request(header: Header) = record {
     # None
 } &let {
-    handle: bool = $context.flow.enip_list_identity_request(header, this);
+    handle: bool = $context.flow.list_identity_request(header, this);
 } &byteorder=littleendian;
 
 type Sock_Info = record {
@@ -114,8 +114,8 @@ type Sock_Info = record {
     sin_zero    : uint8[8];
 } &byteorder=bigendian;
 
-
-type List_Identity_Response(header: ENIP_Header) = record {
+# Limitation: Assumes item_count of 1.
+type List_Identity_Response(header: Header) = record {
     item_count          : uint16;
     type_id             : uint16;
     length              : uint16;
@@ -131,55 +131,54 @@ type List_Identity_Response(header: ENIP_Header) = record {
     product_name        : bytestring &length=product_name_len;
     state               : uint8;
 } &let {
-    handle: bool = $context.flow.enip_list_identity_response(header, this);
+    handle: bool = $context.flow.list_identity_response(header, this);
 } &byteorder=littleendian;
 
-type List_Interfaces_Request(header: ENIP_Header) = record {
+type List_Interfaces_Request(header: Header) = record {
     # None
 } &let {
-    handle: bool = $context.flow.enip_list_interfaces_request(header, this);
+    handle: bool = $context.flow.list_interfaces_request(header, this);
 } &byteorder=littleendian;
 
-type List_Interfaces_Response(header: ENIP_Header) = record {
+type List_Interfaces_Response(header: Header) = record {
     item_count : uint16;
     items : bytestring &restofdata;
 } &let {
-    handle: bool = $context.flow.enip_list_interfaces_response(header, this);
+    handle: bool = $context.flow.list_interfaces_response(header, this);
 } &byteorder=littleendian;
 
-type Register_Session_Request(header: ENIP_Header) = record {
+type Register_Session_Request(header: Header) = record {
     protocol_version : uint16;
     options_flags : uint16;
 } &let {
-    handle: bool = $context.flow.enip_register_session_request(header, this);
+    handle: bool = $context.flow.register_session_request(header, this);
 } &byteorder=littleendian;
 
-type Register_Session_Response(header: ENIP_Header) = record {
+type Register_Session_Response(header: Header) = record {
     protocol_version : uint16;
     options_flags : uint16;
 } &let {
-    handle: bool = $context.flow.enip_register_session_response(header, this);
+    handle: bool = $context.flow.register_session_response(header, this);
 } &byteorder=littleendian;
 
-type Send_RR_Data(header: ENIP_Header) = record {
+type Send_RR_Data(header: Header) = record {
     InterfaceHandle : uint32;
     Timeout : uint16;
     encapsulated_packet : bytestring &restofdata;
 } &let {
-    handle: bool = $context.flow.enip_sendrr_data(header, this);
+    handle: bool = $context.flow.send_rr_data(header, this);
 } &byteorder=littleendian;
 
-
-type Send_Unit_Data(header: ENIP_Header) = record {
+type Send_Unit_Data(header: Header) = record {
     InterfaceHandle : uint32;
     Timeout : uint16;
     encapsulated_packet : bytestring &restofdata;
 } &let {
-    handle: bool = $context.flow.enip_send_unit_data(header, this);
+    handle: bool = $context.flow.send_unit_data(header, this);
 } &byteorder=littleendian;
 
-type UnRegister_Session(header: ENIP_Header) = record {
+type UnRegister_Session(header: Header) = record {
     # None
 } &let {
-    handle: bool = $context.flow.enip_unregister_session(header, this);
+    handle: bool = $context.flow.unregister_session(header, this);
 } &byteorder=littleendian;

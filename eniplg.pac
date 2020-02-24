@@ -18,7 +18,7 @@ connection ENIPLG_Conn(bro_analyzer: BroAnalyzer) {
 %include eniplg-protocol.pac
 
 flow ENIPLG_Flow(is_orig: bool) {
-	datagram = ENIP_PDU(is_orig) withcontext(connection, this);
+	datagram = PDU(is_orig) withcontext(connection, this);
 };
 
 %include eniplg-analyzer.pac
