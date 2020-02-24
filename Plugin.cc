@@ -11,8 +11,8 @@ class Plugin : public plugin::Plugin {
 public:
 	plugin::Configuration Configure()
 		{
-		AddComponent(new ::analyzer::Component("ENIPLG",
-		             ::analyzer::eniplg::ENIPLG_Analyzer::InstantiateAnalyzer));
+		AddComponent(new ::analyzer::Component("ENIPLG_TCP",  ::analyzer::eniplg::ENIPLG_TCP_Analyzer::InstantiateAnalyzer));
+		AddComponent(new ::analyzer::Component("ENIPLG_UDP",  ::analyzer::eniplg::ENIPLG_UDP_Analyzer::InstantiateAnalyzer));
 
 		plugin::Configuration config;
 		config.name = "Zeek::ENIPLG";

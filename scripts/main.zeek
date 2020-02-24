@@ -29,17 +29,16 @@ export {
 # with any signatures, then you can do port-based detection by
 # uncommenting the following and specifying the port(s):
 
-# const ports = { 1234/tcp, 5678/tcp };
-
-
-# redef likely_server_ports += { ports };
+const tcp_ports = { 44818/tcp };
+const udp_ports = { 2222/udp, 44818/udp  };
+redef likely_server_ports += { tcp_ports };
+redef likely_server_ports += { udp_ports };
 
 event zeek_init() &priority=5
 	{
 	Log::create_stream(Eniplg::LOG, [$columns=Info, $ev=log_eniplg, $path="eniplg"]);
-
-	# TODO: If you're using port-based DPD, uncomment this.
-	# Analyzer::register_for_ports(Analyzer::ANALYZER_ENIPLG, ports);
+	Analyzer::register_for_ports(Analyzer::ANALYZER_ENIPLG_TCP, tcp_ports);
+	Analyzer::register_for_ports(Analyzer::ANALYZER_ENIPLG_UDP, udp_ports);
 	}
 
 event eniplg_event(c: connection)

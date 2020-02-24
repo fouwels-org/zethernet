@@ -27,6 +27,6 @@ build-local:
 allow:
 	sudo setcap cap_net_raw,cap_net_admin,cap_dac_override+eip $(OUTPUT_DIR)/bin/zeek
 
-ZEEK_PARAMS = -i enp3s0 -B dpd
+ZEEK_PARAMS = -i eth2 -B dpd
 run-local:
 	cd $(OUTPUT_DIR) && ./bin/zeek $(ZEEK_PARAMS)
