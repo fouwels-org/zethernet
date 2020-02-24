@@ -162,16 +162,16 @@ type Register_Session_Response(header: Header) = record {
 } &byteorder=littleendian;
 
 type Send_RR_Data(header: Header) = record {
-    InterfaceHandle : uint32;
-    Timeout : uint16;
+    interface_handle : uint32;
+    timeout : uint16;
     encapsulated_packet : bytestring &restofdata;
 } &let {
     handle: bool = $context.flow.send_rr_data(header, this);
 } &byteorder=littleendian;
 
 type Send_Unit_Data(header: Header) = record {
-    InterfaceHandle : uint32;
-    Timeout : uint16;
+    interface_handle : uint32;
+    timeout : uint16;
     encapsulated_packet : bytestring &restofdata;
 } &let {
     handle: bool = $context.flow.send_unit_data(header, this);

@@ -1,24 +1,68 @@
-# Types
-type ENIPLG::Header: record;
-type ENIPLG::List_Identity_Response: record;
+event eniplg_header%(c: connection, 
+command: count, 
+length: count, 
+session_handle: count, 
+status: count, 
+sender_context: count, 
+options: count 
+%);
 
-# Events
-event eniplg_header%(c: connection, header: ENIPLG::Header%);
-event eniplg_nop%(c: connection, header: ENIPLG::Header %);
+event eniplg_nop%(c: connection
+%);
 
-event eniplg_list_services_request%(c: connection, header: ENIPLG::Header %);
-event eniplg_list_services_response%(c: connection, header: ENIPLG::Header %);
+event eniplg_list_services_request%(c: connection
+%);
 
-event eniplg_list_identity_request%(c: connection, header: ENIPLG::Header %);
-event eniplg_list_identity_response%(c: connection, header: ENIPLG::Header, body: ENIPLG::List_Identity_Response %);
+event eniplg_list_services_response%(c: connection,
+item_count: count
+%);
 
-event eniplg_list_interfaces_request%(c: connection, header: ENIPLG::Header %);
-event eniplg_list_interfaces_response%(c: connection, header: ENIPLG::Header %);
+event eniplg_list_identity_request%(c: connection
+%);
 
-event eniplg_register_session_request%(c: connection, header: ENIPLG::Header %);
-event eniplg_register_session_response%(c: connection, header: ENIPLG::Header %);
+event eniplg_list_identity_response%(c: connection,
+item_count: count,
+type_id: count,
+encap_version: count,
+sock_info_sin_family: count,
+sock_info_sin_port: count,
+sock_info_sin_addr: count,
+vendor: count,
+device_type: count,
+product_code: count,
+revision: count,
+status: count,
+serial_number: count,
+product_name: string,
+state: count
+%);
 
-event eniplg_unregister_session%(c: connection, header: ENIPLG::Header %);
+event eniplg_list_interfaces_request%(c: connection
+%);
 
-event eniplg_send_rr_data%(c: connection, header: ENIPLG::Header %);
-event eniplg_send_unit_data%(c: connection, header: ENIPLG::Header %);
+event eniplg_list_interfaces_response%(c: connection, 
+item_count: count
+%);
+
+event eniplg_register_session_request%(c: connection, 
+protocol_version: count,
+options_flags: count
+%);
+
+event eniplg_register_session_response%(c: connection, 
+protocol_version: count,
+options_flags: count
+%);
+
+event eniplg_unregister_session%(c: connection
+%);
+
+event eniplg_send_rr_data%(c: connection, 
+interface_handle: count,
+timeout: count
+%);
+
+event eniplg_send_unit_data%(c: connection, 
+interface_handle: count,
+timeout: count
+%);

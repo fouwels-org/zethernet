@@ -15,7 +15,7 @@ up-d:
 # Local
 
 # Update Zeek root to match your root zeek install location
-ZEEK_ROOT=~/proj/zeek-3.0.1
+ZEEK_ROOT=~/proj/zeek-sw
 OUTPUT_DIR=~/proj/zeek-install
 
 dep-local:
