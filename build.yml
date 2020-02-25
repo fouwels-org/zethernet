@@ -1,13 +1,12 @@
-version: "2"
+version: "3.4"
 services:
   zeek: 
     image: registry2.lagoni.co.uk/lagoni-engineering/zeek-kf:dev
-    container_name: "zeek_kf"
     stdin_open: true
     tty: true
     build:
+      network: host
       dockerfile: Dockerfile
       context: "./"
     privileged: true
-    network_mode: host
     command: ["-B", "dpd", "-i", "en0"]
