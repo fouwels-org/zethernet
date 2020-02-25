@@ -59,10 +59,10 @@ event eniplg_unregister_session%(c: connection
 
 event eniplg_send_rr_data%(c: connection, 
 interface_handle: count,
-timeout: count
+timeout_val: count
 %);
 
 event eniplg_send_unit_data%(c: connection, 
 interface_handle: count,
-timeout: count
+timeout_val: count
 %);

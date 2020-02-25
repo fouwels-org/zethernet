@@ -6,22 +6,48 @@
 module Eniplg;
 
 export {
-	redef enum Log::ID += { LOG };
+	redef enum Log::ID += { LOG, LOG_IDENTITIES };
 
-	type Info: record {
+	type Event: record {
 		## Timestamp for when the event happened.
 		ts:     time    &log;
 		## Unique ID for the connection.
 		uid:    string  &log;
 		## The connection's 4-tuple of endpoint addresses/ports.
 		id:     conn_id &log;
-		
-		# ## TODO: Add other fields here that you'd like to log.
+
+		event_name: string  &log;
+		event_message: string &optional &log ;
+	};
+
+	type Identity: record {
+		## Timestamp for when the event happened.
+		ts:     time    &log;
+		## Unique ID for the connection.
+		uid:    string  &log;
+		## The connection's 4-tuple of endpoint addresses/ports.
+		id:     conn_id &log;
+
+		item_count: count &log;
+		type_id: count &log;
+		encap_version: count;
+		sock_info_sin_family: count &log;
+		sock_info_sin_port: count &log;
+		sock_info_sin_addr: count &log;
+		vendor: count &log;
+		device_type: count &log;
+		product_code: count &log;
+		revision: count &log;
+		status: count &log;
+		serial_number: count &log;
+		product_name: string &log;
+		state: count &log;
 	};
 
 	## Event that can be handled to access the eniplg record as it is sent on
 	## to the loggin framework.
-	global log_eniplg: event(rec: Info);
+	global log_eniplg: event(rec: Event);
+	global log_eniplg_identity: event(rec: Identity);
 }
 
 # TODO: The recommended method to do dynamic protocol detection
@@ -35,18 +61,208 @@ redef likely_server_ports += { tcp_ports };
 redef likely_server_ports += { udp_ports };
 
 event zeek_init() &priority=5
-	{
-	Log::create_stream(Eniplg::LOG, [$columns=Info, $ev=log_eniplg, $path="eniplg"]);
+{
+	Log::create_stream(Eniplg::LOG, [$columns=Event, $ev=log_eniplg, $path="eniplg"]);
+	Log::create_stream(Eniplg::LOG_IDENTITIES, [$columns=Identity, $ev=log_eniplg_identity, $path="eniplg_identities"]);
 	Analyzer::register_for_ports(Analyzer::ANALYZER_ENIPLG_TCP, tcp_ports);
 	Analyzer::register_for_ports(Analyzer::ANALYZER_ENIPLG_UDP, udp_ports);
-	}
+}
 
-event eniplg_event(c: connection)
-	{
-	local info: Info;
-	info$ts  = network_time();
-	info$uid = c$uid;
-	info$id  = c$id;
+# eniplg_identities.log
 
-	Log::write(Eniplg::LOG, info);
-	}
+event eniplg_list_identity_response(c: connection,
+	item_count: count,
+	type_id: count,
+	encap_version: count,
+	sock_info_sin_family: count,
+	sock_info_sin_port: count,
+	sock_info_sin_addr: count,
+	vendor: count,
+	device_type: count,
+	product_code: count,
+	revision: count,
+	status: count,
+	serial_number: count,
+	product_name: string,
+	state: count
+){
+	local idnt: Identity;
+	idnt$ts  = network_time();
+	idnt$uid = c$uid;
+	idnt$id  = c$id;
+	idnt$item_count = item_count;
+	idnt$type_id = type_id;
+	idnt$encap_version = encap_version;
+	idnt$sock_info_sin_family = sock_info_sin_family;
+	idnt$sock_info_sin_port = sock_info_sin_port;
+	idnt$sock_info_sin_addr = sock_info_sin_addr;
+	idnt$vendor = vendor;
+	idnt$device_type = device_type;
+	idnt$product_code = product_code;
+	idnt$revision = revision;
+	idnt$status = status;
+	idnt$serial_number = serial_number;
+	idnt$product_name = product_name;
+	idnt$state = state;
+
+	Log::write(Eniplg::LOG_IDENTITIES, idnt);
+}
+
+# eniplg.log
+
+event eniplg_header(c: connection, 
+	command: count, 
+	length: count, 
+	session_handle: count, 
+	status: count, 
+	sender_context: count, 
+	options: count
+){
+	# DISABLED
+	return; 
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_header";
+	ev$event_message = fmt("%d", command);
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_nop(c: connection
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_nop";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_list_services_request(c: connection
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_list_services_request";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_list_services_response(c: connection,
+	item_count: count
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_list_services_response";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_list_identity_request(c: connection
+){
+	# DISABLED
+	return;
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_list_identity_request";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_list_interfaces_request(c: connection
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_list_interfaces_request";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_list_interfaces_response(c: connection, 
+	item_count: count
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_list_interfaces_response";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_register_session_request(c: connection, 
+	protocol_version: count,
+	options_flags: count
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_register_session_request";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_register_session_response(c: connection, 
+	protocol_version: count,
+	options_flags: count
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_register_session_response";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_unregister_session(c: connection
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_unregister_session";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_send_rr_data(c: connection, 
+	interface_handle: count,
+	timeout_val: count
+){
+	# DISABLED
+	return;
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_send_rr_data";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_send_unit_data(c: connection, 
+	interface_handle: count,
+	timeout_val: count
+){
+	# DISABLED
+	return;
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_send_unit_data";
+
+	Log::write(Eniplg::LOG, ev);
+}

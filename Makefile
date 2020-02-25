@@ -21,12 +21,18 @@ OUTPUT_DIR=~/proj/zeek-install
 dep-local:
 	apt-get update && apt-get install -y python3 cmake build-essential cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev
 
-build-local:
-	cd $(ZEEK_ROOT) && ./configure --enable-debug --prefix=$(OUTPUT_DIR) --generator=Ninja && ninja -C build && ninja -C build install
+conf-local: 
+	cd $(ZEEK_ROOT) && ./configure --enable-debug --prefix=$(OUTPUT_DIR) --generator=Ninja
+
+build-local: install-scripts
+	cd $(ZEEK_ROOT) &&  ninja -C build && ninja -C build install
+
+install-scripts:
+	rm -rf $(ZEEK_ROOT)/scripts/base/protocols/eniplg/ && cp -r ./scripts/. $(ZEEK_ROOT)/scripts/base/protocols/eniplg/
 
 allow:
 	sudo setcap cap_net_raw,cap_net_admin,cap_dac_override+eip $(OUTPUT_DIR)/bin/zeek
 
-ZEEK_PARAMS = -i eth2 -B dpd
+ZEEK_PARAMS = -i enp3s0
 run-local:
 	cd $(OUTPUT_DIR) && ./bin/zeek $(ZEEK_PARAMS)
