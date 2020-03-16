@@ -24,8 +24,6 @@ enum command_codes {
     UNREGISTER_SESSION  = 0x66,
     SEND_RR_DATA        = 0x6F,
     SEND_UNIT_DATA      = 0x70,
-
-    # Not Implemented
     INDICATE_STATUS     = 0x72,
     CANCEL              = 0x73,
     # Other values are Reserved for future usage or Reserved for legacy
@@ -62,7 +60,10 @@ type Request(header: Header) = record {
         UNREGISTER_SESSION      -> unregister_session : UnRegister_Session(header);
         SEND_RR_DATA            -> send_rr_data : Send_RR_Data(header);
         SEND_UNIT_DATA          -> send_unit_data : Send_Unit_Data(header);
-        default                 -> unknown : bytestring &restofdata;
+        
+        INDICATE_STATUS         -> indicate_status : Indicate_Status_Request(header);
+        CANCEL                  -> cancel : Cancel_Request(header);
+        default                 -> unrecognized : Unrecognized_Request(header);
     };
 } &byteorder=littleendian;
 
@@ -77,7 +78,10 @@ type Response(header: Header) = record {
         UNREGISTER_SESSION  -> unregister_session : UnRegister_Session(header);
         SEND_RR_DATA        -> sendrr_data : Send_RR_Data(header);
         SEND_UNIT_DATA      -> send_unit_data : Send_Unit_Data(header);
-        default             -> unknown : bytestring &restofdata;
+
+        INDICATE_STATUS         -> indicate_status : Indicate_Status_Response(header);
+        CANCEL                  -> cancel : Cancel_Response(header);
+        default             -> unrecognized : Unrecognized_Response(header);
     };
 } &byteorder=littleendian;
 
@@ -181,4 +185,40 @@ type UnRegister_Session(header: Header) = record {
     # None
 } &let {
     handle: bool = $context.flow.unregister_session(header, this);
+} &byteorder=littleendian;
+
+type Indicate_Status_Request(header: Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.indicate_status_request(header, this);
+} &byteorder=littleendian;
+
+type Indicate_Status_Response(header: Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.indicate_status_response(header, this);
+} &byteorder=littleendian;
+
+type Cancel_Request(header: Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.cancel_request(header, this);
+} &byteorder=littleendian;
+
+type Cancel_Response(header: Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.cancel_response(header, this);
+} &byteorder=littleendian;
+
+type Unrecognized_Request(header: Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.unrecognized_request(header, this);
+} &byteorder=littleendian;
+
+type Unrecognized_Response(header: Header) = record {
+    # None
+} &let {
+    handle: bool = $context.flow.unrecognized_response(header, this);
 } &byteorder=littleendian;

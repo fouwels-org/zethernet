@@ -6,7 +6,7 @@
 module Eniplg;
 
 export {
-	redef enum Log::ID += { LOG, LOG_IDENTITIES };
+	redef enum Log::ID += { LOG, LOG_HEADERS, LOG_IDENTITIES, LOG_UNRECOGNIZED };
 
 	type Event: record {
 		## Timestamp for when the event happened.
@@ -17,7 +17,7 @@ export {
 		id:     conn_id &log;
 
 		event_name: string  &log;
-		event_message: string &optional &log ;
+		command_code: string &optional &log;
 	};
 
 	type Identity: record {
@@ -47,6 +47,8 @@ export {
 	## Event that can be handled to access the eniplg record as it is sent on
 	## to the loggin framework.
 	global log_eniplg: event(rec: Event);
+	global log_eniplg_headers: event(rec: Event);
+	global log_eniplg_unrecognized: event(rec: Event);
 	global log_eniplg_identity: event(rec: Identity);
 }
 
@@ -63,6 +65,8 @@ redef likely_server_ports += { udp_ports };
 event zeek_init() &priority=5
 {
 	Log::create_stream(Eniplg::LOG, [$columns=Event, $ev=log_eniplg, $path="eniplg"]);
+	Log::create_stream(Eniplg::LOG_HEADERS, [$columns=Event, $ev=log_eniplg_headers, $path="eniplg_headers"]);
+	Log::create_stream(Eniplg::LOG_UNRECOGNIZED, [$columns=Event, $ev=log_eniplg_unrecognized, $path="eniplg_unrecognized"]);
 	Log::create_stream(Eniplg::LOG_IDENTITIES, [$columns=Identity, $ev=log_eniplg_identity, $path="eniplg_identities"]);
 	Analyzer::register_for_ports(Analyzer::ANALYZER_ENIPLG_TCP, tcp_ports);
 	Analyzer::register_for_ports(Analyzer::ANALYZER_ENIPLG_UDP, udp_ports);
@@ -108,7 +112,7 @@ event eniplg_list_identity_response(c: connection,
 	Log::write(Eniplg::LOG_IDENTITIES, idnt);
 }
 
-# eniplg.log
+# eniplg_headers.log
 
 event eniplg_header(c: connection, 
 	command: count, 
@@ -118,17 +122,17 @@ event eniplg_header(c: connection,
 	sender_context: count, 
 	options: count
 ){
-	# DISABLED
-	return; 
 	local ev: Event;
 	ev$ts  = network_time();
 	ev$uid = c$uid;
 	ev$id  = c$id;
 	ev$event_name = "eniplg_header";
-	ev$event_message = fmt("%d", command);
+	ev$command_code = fmt("%d", command);
 
-	Log::write(Eniplg::LOG, ev);
+	Log::write(Eniplg::LOG_HEADERS, ev);
 }
+
+# eniplg.log
 
 event eniplg_nop(c: connection
 ){
@@ -166,8 +170,6 @@ event eniplg_list_services_response(c: connection,
 
 event eniplg_list_identity_request(c: connection
 ){
-	# DISABLED
-	return;
 	local ev: Event;
 	ev$ts  = network_time();
 	ev$uid = c$uid;
@@ -241,8 +243,6 @@ event eniplg_send_rr_data(c: connection,
 	interface_handle: count,
 	timeout_val: count
 ){
-	# DISABLED
-	return;
 	local ev: Event;
 	ev$ts  = network_time();
 	ev$uid = c$uid;
@@ -256,8 +256,6 @@ event eniplg_send_unit_data(c: connection,
 	interface_handle: count,
 	timeout_val: count
 ){
-	# DISABLED
-	return;
 	local ev: Event;
 	ev$ts  = network_time();
 	ev$uid = c$uid;
@@ -265,4 +263,74 @@ event eniplg_send_unit_data(c: connection,
 	ev$event_name = "eniplg_send_unit_data";
 
 	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_indicate_status_request(c: connection
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_indicate_status_request";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_indicate_status_response(c: connection
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_indicate_status_response";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_cancel_request(c: connection
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_cancel_request";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_cancel_response(c: connection
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_cancel_response";
+
+	Log::write(Eniplg::LOG, ev);
+}
+
+event eniplg_unrecognized_request(c: connection,
+command: count
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_unrecognized_request";
+	ev$command_code = fmt("%d", command);
+
+	Log::write(Eniplg::LOG_UNRECOGNIZED, ev);
+}
+
+event eniplg_unrecognized_request(c: connection,
+command: count
+){
+	local ev: Event;
+	ev$ts  = network_time();
+	ev$uid = c$uid;
+	ev$id  = c$id;
+	ev$event_name = "eniplg_unrecognized_response";
+	ev$command_code = fmt("%d", command);
+
+	Log::write(Eniplg::LOG_UNRECOGNIZED, ev);
 }

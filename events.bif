@@ -66,3 +66,23 @@ event eniplg_send_unit_data%(c: connection,
 interface_handle: count,
 timeout_val: count
 %);
+
+event eniplg_indicate_status_request%(c: connection
+%);
+
+event eniplg_indicate_status_response%(c: connection
+%);
+
+event eniplg_cancel_request%(c: connection
+%);
+
+event eniplg_cancel_response%(c: connection
+%);
+
+event eniplg_unrecognized_request%(c: connection,
+command: count
+%);
+
+event eniplg_unrecognized_response%(c: connection, 
+command: count
+%);

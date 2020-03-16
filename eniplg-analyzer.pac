@@ -107,4 +107,42 @@ refine flow ENIPLG_Flow += {
 		);
 		return true;
 	%}
+	function indicate_status_request(header: Header, body: Indicate_Status_Request): bool 
+	%{
+		BifEvent::generate_eniplg_indicate_status_request(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn()
+		);
+		return true;
+	%}
+	function indicate_status_response(header: Header, body: Indicate_Status_Response): bool 
+	%{
+		BifEvent::generate_eniplg_indicate_status_response(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn()
+		);
+		return true;
+	%}
+	function cancel_request(header: Header, body: Cancel_Request): bool 
+	%{
+		BifEvent::generate_eniplg_cancel_request(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn()
+		);
+		return true;
+	%}
+	function cancel_response(header: Header, body: Cancel_Response): bool 
+	%{
+		BifEvent::generate_eniplg_cancel_response(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn()
+		);
+		return true;
+	%}
+	function unrecognized_request(header: Header, body: Unrecognized_Request): bool 
+	%{
+		BifEvent::generate_eniplg_unrecognized_request(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn(),
+		${header.command}
+		);
+		return true;
+	%}
+	function unrecognized_response(header: Header, body: Unrecognized_Response): bool 
+	%{
+		BifEvent::generate_eniplg_unrecognized_response(connection()->bro_analyzer(), connection()->bro_analyzer()->Conn(),
+		${header.command}
+		);
+		return true;
+	%}
 };
