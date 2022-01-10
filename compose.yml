@@ -4,9 +4,9 @@
 ---
 services:
   zeek:
-    image: ghcr.io/fouwels/enip:dev
+    image: ghcr.io/fouwels/zethernet:dev
     network_mode: host
     build:
       dockerfile: Dockerfile
       context: "./"
-    command: [ "-B", "dpd", "-i", "en0" ]
+    command: [ "-B", "dpd", "-i", "eth0" ]

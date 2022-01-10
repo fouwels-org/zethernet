@@ -4,7 +4,9 @@
 
 FROM ubuntu:impish-20220105 as build
 
-RUN apt-get update && apt-get install -y python3 cmake build-essential cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev git
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && \
+    apt-get install -y python3 cmake build-essential cmake make gcc g++ flex bison libpcap-dev libssl-dev python-dev swig zlib1g-dev git && rm -rf /var/lib/apt/lists/*
 
 ENV ZEEK_VERSION v3.2.4
 
@@ -12,9 +14,8 @@ ENV ZEEK_VERSION v3.2.4
 WORKDIR /build
 RUN git clone --depth 1 --recursive --branch $ZEEK_VERSION https://github.com/zeek/zeek
 
-RUN apt-get update && apt-get install -y ninja-build
-RUN cd /build/zeek && ./configure --enable-debug --generator=Ninja
-RUN cd /build/zeek && ninja -C build && ninja -C build install
+RUN cd /build/zeek && ./configure --enable-debug
+RUN cd /build/zeek && make -j $(nproc) && make install
 
 # Copy in module
 COPY . /build/zeek/src/analyzer/protocol/eniplg
@@ -23,13 +24,18 @@ RUN echo "add_subdirectory(eniplg)" >> /build/zeek/src/analyzer/protocol/CMakeLi
 RUN echo "@load base/protocols/eniplg" >> /build/zeek/scripts/base/init-default.zeek
 
 # Rebuild Zeek
-RUN cd /build/zeek && ./configure --enable-debug --generator=Ninja
-RUN cd /build/zeek && ninja -C build && ninja -C build install
-
-#RUN setcap cap_net_raw,cap_net_admin,cap_dac_override+eip /usr/local/zeek/bin/zeek
+RUN cd /build/zeek && ./configure --enable-debug
+RUN cd /build/zeek && make -j $(nproc) && make install
 
 FROM ubuntu:impish-20220105
-RUN apt-get update && apt-get install -y libpcap-dev libssl-dev zlib1g-dev 
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && \
+    apt-get install -y libpcap-dev libssl-dev zlib1g-dev && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /usr/local/zeek/ /usr/local/zeek/
+RUN ln -s /usr/local/zeek/bin/zeek /usr/local/bin/zeek
+
 COPY ./test-files/ /test-files/
-ENTRYPOINT [ "/usr/local/zeek/bin/zeek" ]
+
+ENTRYPOINT [ "zeek" ]
