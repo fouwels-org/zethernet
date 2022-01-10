@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Kaelan Thijs Fouwels <kaelan.thijs@fouwels.com>
+#
+# SPDX-License-Identifier: MIT
+
 COMPOSE=docker compose
 BUILDFILE=compose.yml
 DOCKER=docker
@@ -37,6 +41,7 @@ build-local: install-scripts
 allow:
 	sudo setcap cap_net_raw,cap_net_admin,cap_dac_override+eip $(OUTPUT_DIR)/bin/zeek
 
+# Testing
 ZEEK_PARAMS = -r $(ZEEK_ROOT)/src/analyzer/protocol/eniplg/tests/lagoni/CLX5000_Download_RM.pcapng
 run-local:
 	cd $(OUTPUT_DIR) && ./bin/zeek $(ZEEK_PARAMS)

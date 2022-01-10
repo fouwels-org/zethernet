@@ -1,14 +1,24 @@
+<!-- 
+SPDX-FileCopyrightText: 2020 Kaelan Thijs Fouwels <kaelan.thijs@fouwels.com>
+
+SPDX-License-Identifier: MIT
+-->
+
 # Zeek - ENIP
 
-Industrial Ethernet/IP DPI driver for the ZEEK IDS platform
+Industrial Ethernet/IP DPI/IDS module for ZEEK, for OT/ICS ENIP event analysis.
 
-# Building 
-- cd to `$WORKSPACE`
-- clone zeek 3.0.1 (`git clone --recursive --branch v3.0.1 https://github.com/zeek/zeek`)
-- cd to `$WORKSPACE/zeek/src/analyzer/protocol`
-- clone this repo
-- update `ZEEK_ROOT` and `OUTPUT_DIR`, and `ZEEK_PARAMS` in the makefile.
-- run `make conf-local`, `make build-local`, `make run-local` within this repo to link to and build the parent zeek installation. Run `make dep-local` to install ubuntu-style dependencies.
+Targetting ZEEK v3.X.X
+
+Written in BINPAC, a ZEEK specific DSL..
+
+See `events.bif` for exported handlers, all standard ENIP/IP events are decoded and made available to subscription.
+
+See `scripts/main.zeek` for an example zeek/scripts consumer for all events.
+
+See `Dockerfile` for the three stage compilation/zeek module linking process.
 
 ## License
 MIT and/or MIT compatible
+
+Licensing tracked via SPDX, see file level tags for specific attribution
