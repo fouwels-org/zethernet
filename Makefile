@@ -1,5 +1,5 @@
-COMPOSE=docker-compose
-BUILDFILE=build.yml
+COMPOSE=docker compose
+BUILDFILE=compose.yml
 DOCKER=docker
 
 # Docker

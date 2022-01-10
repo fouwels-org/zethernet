@@ -11,6 +11,7 @@
 using namespace analyzer::eniplg;
 
 /* TCP */
+
 ENIPLG_TCP_Analyzer::ENIPLG_TCP_Analyzer(Connection* c) : tcp::TCP_ApplicationAnalyzer("ENIPLG_TCP", c)
 {
 	interp = new binpac::ENIPLG::ENIPLG_Conn(this);

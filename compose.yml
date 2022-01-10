@@ -1,0 +1,8 @@
+services:
+  zeek:
+    image: ghcr.io/fouwels/enip:dev
+    network_mode: host
+    build:
+      dockerfile: Dockerfile
+      context: "./"
+    command: [ "-B", "dpd", "-i", "en0" ]

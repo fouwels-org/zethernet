@@ -28,5 +28,5 @@ RUN cd /build/zeek && ninja -C build && ninja -C build install
 FROM ubuntu:18.04
 RUN apt-get update && apt-get install -y libpcap-dev libssl-dev zlib1g-dev 
 COPY --from=build /usr/local/zeek/ /usr/local/zeek/
-COPY ./tests/ /tests/
+COPY ./test-files/ /test-files/
 ENTRYPOINT [ "/usr/local/zeek/bin/zeek" ]
